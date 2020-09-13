@@ -34,6 +34,7 @@
 		8F111B30250D11C7005B51DE /* LastlyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastlyTests.swift; sourceTree = "<group>"; };
 		8F111B32250D11C7005B51DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8F40C7B9250D6C0E006C5638 /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		8FCE8E11250E8D930034B2DE /* prototypingAPI.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = prototypingAPI.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		8FDBB432250C350300FAE7C6 /* sample-album-search.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "sample-album-search.json"; sourceTree = SOURCE_ROOT; };
 		8FEEE6C2250BD19E00F8DD20 /* Lastly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lastly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FEEE6C5250BD19E00F8DD20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +70,7 @@
 			children = (
 				8F111B30250D11C7005B51DE /* LastlyTests.swift */,
 				8F111B32250D11C7005B51DE /* Info.plist */,
+				8FCE8E11250E8D930034B2DE /* prototypingAPI.playground */,
 			);
 			path = LastlyTests;
 			sourceTree = "<group>";

@@ -66,3 +66,25 @@ extension Album {
         }
     }
 }
+
+extension Album {
+    static func getAlbumData(data: Data?) -> [Album] {
+        guard
+            let data = data,
+            let dictionaryFromJSON = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String:Any],
+            let results = dictionaryFromJSON["results"] as? [String:Any],
+            let albummatches = results["albummatches"] as? [String:Any],
+            let albums = albummatches["album"] as? [[String:Any]]
+            else {
+                assert(false)
+            return []
+        }
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: albums, options: []) else {
+            assert(false)
+            return []
+        }
+
+        return Album.albums(forJsonData: jsonData)
+    }
+}

@@ -9,18 +9,12 @@
 import Foundation
 import Combine
 
-extension LastFMAPI {
+struct LastFMAPI {
     enum APIErrors: Error {
         case invalidProtocol
         case albumResultsNotFound
     }
 
-    static func getAlbumData(data: Data?) throws -> [Album] {
-        
-    }
-}
-
-struct LastFMAPI {
     enum LastResponseStatus {
         case noSearchRun
         case good
@@ -54,12 +48,8 @@ struct LastFMAPI {
                 return
             }
             
-            do {
-                self.results.value = try LastFMAPI.getAlbumData(data: data)
-                self.status.value = .good
-            } catch let parseError {
-                self.status.value = .misformatted(parseError)
-            }
+            self.results.value = Album.getAlbumData(data: data)
+            self.status.value = .good
         }
     }
 }
