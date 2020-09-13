@@ -8,12 +8,14 @@
 
 import Foundation
 
-struct Album: Decodable {
+struct Album: Decodable, Identifiable {
     var name: String
     var artist: String
     var url: String
     var art: [AlbumImage]
     var mbid: String
+
+    var id: String { url }
     
     enum CodingKeys: String, CodingKey {
         case name

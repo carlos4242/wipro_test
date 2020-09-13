@@ -8,8 +8,9 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
-struct LastFMAPI {
+class LastFMAPI: ObservableObject {
     enum APIErrors: Error {
         case invalidProtocol
         case albumResultsNotFound
@@ -23,10 +24,42 @@ struct LastFMAPI {
         case misformatted(Error)
     }
 
-    let results = CurrentValueSubject<[Album], Never>([])
-    let status = CurrentValueSubject<LastResponseStatus, Never>(.noSearchRun)
+    init(initialResults: [Album] = []) {
+        results = initialResults
+    }
+
+    @Published var results: [Album]
+    @Published var status: LastResponseStatus = .noSearchRun
+
+    @Published var searchText: String = "" {
+        didSet {
+            searchTextChanged.send(searchText)
+        }
+    }
+
+    private let searchTextChanged = PassthroughSubject<String, Never>()
+    var searchTextDebounced: AnyPublisher<String, Never> {
+        searchTextChanged
+            .debounce(for: .seconds(0.9), scheduler: RunLoop.main)
+            .eraseToAnyPublisher()
+    }
+
+    var monitorSearchText: AnyCancellable?
+
+    func monitor() {
+        monitorSearchText = searchTextDebounced.sink { [weak self] (newSearchText) in
+            self?.search(byAlbumName: newSearchText)
+        }
+    }
 
     func search(byAlbumName albumName: String) {
+        guard !albumName.isEmpty else {
+            // the simplest case, clear the search
+            self.results = []
+            self.status = .good
+            return
+        }
+
         guard let sanitisedAlbumName = albumName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let searchURL = URL(string: "http://ws.audioscrobbler.com/2.0/?method=album.search&album=\(sanitisedAlbumName)&api_key=cec17d8b1fb7c3eed6c63ac255cde1b5&format=json") else {
             return
@@ -34,22 +67,34 @@ struct LastFMAPI {
 
         URLSession.shared.dataTask(with: searchURL) { (data, response, error) in
             if let error = error {
-                self.status.value = .error(error)
+                DispatchQueue.main.async {
+                    print("error: \(error)")
+                    self.status = .error(error)
+                }
                 return
             }
 
             guard let response = response as? HTTPURLResponse else {
-                self.status.value = .error(APIErrors.invalidProtocol)
+                DispatchQueue.main.async {
+                    self.status = .error(APIErrors.invalidProtocol)
+                }
                 return
             }
             
             guard (200..<400).contains(response.statusCode) else {
-                self.status.value = .serverError(response.statusCode)
+                DispatchQueue.main.async {
+                    self.status = .serverError(response.statusCode)
+                }
                 return
             }
-            
-            self.results.value = Album.getAlbumData(data: data)
-            self.status.value = .good
-        }
+
+            let results = Album.getAlbumData(data: data)
+
+            DispatchQueue.main.async {
+                self.results = results
+                self.status = .good
+            }
+
+        }.resume()
     }
 }
